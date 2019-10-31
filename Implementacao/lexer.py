@@ -1,7 +1,21 @@
+from sys import argv
+import ply.lex as lex
+
+# symbol_table = {
+#     'token': [],
+#     'lexema': [],
+#     'tipo': [],
+#     'dim': [],
+#     'tamanho': [],
+#     'escopo': [],
+#     'inicializada': [],
+#     'linha': [],
+#     'coluna': [],
+# }
+
 reserved = {
     'se': 'SE',
     'repita': 'REPITA',
-    'principal': 'PRINCIPAL',
     'fim': 'FIM',
     'flutuante': 'FLUTUANTE',
     'retorna': 'RETORNA',
@@ -49,7 +63,7 @@ t_OPERADOR_RELACIONAL_MENOR_IGUAL = r'<='
 t_OPERADOR_RELACIONAL_MAIOR_IGUAL = r'>='
 t_OPERADOR_SOMA = r'\+'
 t_OPERADOR_SUBTRACAO = r'-'
-t_OPERADOR_DIVISAO = r'\\'
+t_OPERADOR_DIVISAO = r'\/'
 t_OPERADOR_MULTIPLICACAO = r'\*'
 t_OPERADOR_LOGICO_E = r'&&'
 t_OPERADOR_LOGICO_OU = r'\|\|'
@@ -77,7 +91,7 @@ def t_NOTACAO_CIENTIFICA(t):
 
 
 def t_NUMERO_FLUTUANTE(t):
-    r'[+-]?\d+\.\d+'
+    r'[+-]?\d+\.(\d+)?'
     t.value = float(t.value)
     return t
 
@@ -89,7 +103,7 @@ def t_NUMERO_INTEIRO(t):
 
 
 def t_ID(t):
-    r'[A-Za-záàâãéêíóôõúçÁÀÂÃÉÊÍÓÔÕÚÇ]+[0-9]*'
+    r'[A-Za-záàâãéêíóôõúçÁÀÂÃÉÊÍÓÔÕÚÇ_]+[0-9]*'
     t.type = reserved.get(t.value, 'ID')
     return t
 
@@ -103,3 +117,5 @@ def t_error(t):
     print("Caractere ilegal: '%s';" % t.value[0])
     print("Linha número: %d \n" % t.lineno)
     t.lexer.skip(1)
+
+lexer = lex.lex()
