@@ -21,10 +21,15 @@ def p_lista_declaracoes(p):
     """
     lista_declaracoes = Node("lista_declaracoes")
     p[0] = lista_declaracoes
-    p[1].parent = lista_declaracoes
 
     if len(p) > 2:
+        for child in p[1].children:
+            child.parent = p[0]
+
         p[2].parent = lista_declaracoes
+
+    else:
+        p[1].parent = p[0]
 
 def p_declaracao(p):
     """ declaracao : declaracao_variaveis
@@ -48,6 +53,16 @@ def p_declaracao_variaveis(p):
     p[2] = dois_pontos
     
     p[3].parent = declaracao_variaveis
+
+def p_declaracao_variaveis_error1(p):
+    """ declaracao_variaveis : tipo DOIS_PONTOS error  """
+    print("Lista de variaveis com erro")
+    exit(1)
+
+def p_declaracao_variaveis_error(p):
+    """ declaracao_variaveis : tipo DOIS_PONTOS  """
+    print("Lista de variaveis faltando")
+    exit(1)
 
 def p_inicializacao_variaveis(p):
     """ inicializacao_variaveis : atribuicao """
@@ -84,14 +99,19 @@ def p_lista_variaveis(p):
     lista_variaveis = Node("lista_variaveis")
 
     p[0] = lista_variaveis
-    p[1].parent = lista_variaveis
 
     if len(p) > 2:
+        for child in p[1].children:
+            child.parent = p[0]
+
         virgula = Node("virgula", parent=lista_variaveis)
         Node(p[2], parent=virgula)
         p[2] = virgula
 
         p[3].parent = lista_variaveis
+    else:
+        p[1].parent = p[0]
+
 
 def p_var(p):
     """ var : ID
@@ -105,14 +125,15 @@ def p_var(p):
     p[1] = id
     
     if len(p) > 2:
-        p[2].parent = var 
+        for ind in p[2]:
+            ind.parent = var 
 
 def p_indice(p):
     """ indice : indice ABRE_COLCHETES expressao FECHA_COLCHETES
         | ABRE_COLCHETES expressao FECHA_COLCHETES
     """
     indice = Node("indice")
-    p[0] = indice
+
 
     if len(p) == 4:
         abre_colchetes = Node("ABRE_COLCHETES", parent=indice)
@@ -125,9 +146,9 @@ def p_indice(p):
         Node(p[3], parent=fecha_colchetes)
         p[3] = fecha_colchetes
 
+        p[0] = [indice]
 
-    else: 
-        p[1].parent = indice
+    else:
 
         abre_colchetes = Node("ABRE_COLCHETES", parent=indice)
         Node(p[2], parent=abre_colchetes)
@@ -138,6 +159,8 @@ def p_indice(p):
         fecha_colchetes = Node("FECHA_COLCHETES", parent=indice)
         Node(p[4], parent=fecha_colchetes)
         p[4] = fecha_colchetes
+
+        p[0] = p[1] + [indice]
  
 
 def p_cabecalho(p):
@@ -180,14 +203,19 @@ def p_lista_parametros(p):
     """
     lista_parametros = Node("lista_parametros")
     p[0] = lista_parametros
-    p[1].parent = lista_parametros
 
     if len(p) > 2:
+        for child in p[1].children:
+            child.parent = p[0]
+
         virgula = Node("VIRGULA", parent=lista_parametros)
         Node(p[2], parent=virgula)
         p[2] = virgula
 
         p[3].parent = lista_parametros
+
+    else:
+        p[1].parent = lista_parametros
 
 def p_acao(p):
     """ acao : expressao
@@ -208,10 +236,15 @@ def p_corpo(p):
     """
     corpo = Node("corpo")
     p[0] = corpo
-    p[1].parent = corpo
 
     if len(p) > 2:
-        p[2].parent = corpo
+        for child in p[1].children:
+            child.parent = corpo
+        
+        p[2].parent = p[0]
+
+    else:
+        p[1].parent = p[0]
 
 def p_parametro(p):
     """ parametro : tipo DOIS_PONTOS ID
@@ -291,7 +324,7 @@ def p_atribuicao(p):
     atribuicao = Node("atribuicao")
     p[0] = atribuicao
     p[1].parent = atribuicao
-    p[2] = Node("ATRIBUICAO", parent=atribuicao)
+    p[2] = Node(p[2], parent=atribuicao)
     p[3].parent = atribuicao
 
 def p_leia(p):
@@ -585,12 +618,7 @@ def p_error(p):
         exit(1)
     return
 
-if __name__ == "__main__":
-    file = open(sys.argv[1], encoding="utf8")
-    code = file.read()
-
-    file.close()
-
+def run(code):
     parser = yacc.yacc()
 
     try:
@@ -601,6 +629,6 @@ if __name__ == "__main__":
     if (raiz):
         print("Gerando a imagem da árvore")
         UniqueDotExporter(raiz).to_picture("arvore.png")
-        # return raiz
+        return raiz
     else:
         print("Não foi possível gerar a árvore sintática")
