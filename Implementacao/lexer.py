@@ -1,18 +1,6 @@
 from sys import argv
 import ply.lex as lex
 
-# symbol_table = {
-#     'token': [],
-#     'lexema': [],
-#     'tipo': [],
-#     'dim': [],
-#     'tamanho': [],
-#     'escopo': [],
-#     'inicializada': [],
-#     'linha': [],
-#     'coluna': [],
-# }
-
 reserved = {
     'se': 'SE',
     'repita': 'REPITA',
