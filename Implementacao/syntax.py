@@ -134,7 +134,6 @@ def p_indice(p):
     """
     indice = Node("indice")
 
-
     if len(p) == 4:
         abre_colchetes = Node("ABRE_COLCHETES", parent=indice)
         Node(p[1], parent=abre_colchetes)
@@ -582,6 +581,8 @@ def p_chamada_funcao(p):
     Node(p[2], parent=abre_parenteses)
     p[2] = abre_parenteses
 
+    p[3].parent = chamada_funcao
+
     fecha_parenteses = Node("FECHA_PARENTESES", parent=chamada_funcao)
     Node(p[4], parent=fecha_parenteses)
     p[4] = fecha_parenteses
@@ -595,10 +596,14 @@ def p_lista_argumentos(p):
     p[0] = lista_argumentos
 
     if len(p) > 2:
-        p[1].parent = lista_argumentos
+        for child in p[1].children:
+            child.parent = lista_argumentos
+
         virgula = Node("VIRGULA", parent=lista_argumentos)
         Node("VIRGULA", parent=virgula)
         p[2] = virgula
+
+        p[3].parent = lista_argumentos
 
     else:
         p[1].parent = lista_argumentos
